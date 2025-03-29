@@ -50,7 +50,45 @@ function init() {
  */
 function fetchRandomMeal() {
     // Fill in
-}
+    fetch("https://www.themealdb.com/api/json/v1/1/random.php")
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+
+      //veien for å hente informasjon
+      let meal = data.meals[0];
+
+      //Image
+      document.getElementById("img").src = meal.strMealThumb;
+
+      //Meal Name
+      document.getElementById("MealName").textContent = meal.strMeal;
+
+      //category
+      document.getElementById("category").textContent = "Category: " + meal.strCategory;
+
+      //ingredients
+      let ingredientList = document.getElementById("ingredients");
+
+      for ( let i = 1; i <= 20; i++){
+        let ingredient = meal["strIngredient" + i];
+        let measure = meal["strMeasure" + i];
+
+        if (!ingredient || ingredient.trim() === "") { 
+          break; 
+        }
+        else {
+          const li = document.createElement("li");
+      
+          li.textContent = measure + " " + ingredient;
+          ingredientList.appendChild(li);
+        }}
+
+        //instructions
+        document.getElementById("instructions").textContent = meal.strInstructions
+      })
+    }
+
 
 /*
 Display Meal Data in the DOM
