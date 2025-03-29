@@ -57,35 +57,8 @@ function fetchRandomMeal() {
 
       //veien for å hente informasjon
       let meal = data.meals[0];
-
-      //Image
-      document.getElementById("img").src = meal.strMealThumb;
-
-      //Meal Name
-      document.getElementById("MealName").textContent = meal.strMeal;
-
-      //category
-      document.getElementById("category").textContent = "Category: " + meal.strCategory;
-
-      //ingredients
-      let ingredientList = document.getElementById("ingredients");
-
-      for ( let i = 1; i <= 20; i++){
-        let ingredient = meal["strIngredient" + i];
-        let measure = meal["strMeasure" + i];
-
-        if (!ingredient || ingredient.trim() === "") { 
-          break; 
-        }
-        else {
-          const li = document.createElement("li");
-      
-          li.textContent = measure + " " + ingredient;
-          ingredientList.appendChild(li);
-        }}
-
-        //instructions
-        document.getElementById("instructions").textContent = meal.strInstructions
+      //linker meal dataen til funksjonen som viser det i HTML dokumentet
+      displayMealData(meal)
       })
     }
 
@@ -97,7 +70,34 @@ Receives a meal object with fields like:
   strIngredientX, strMeasureX, etc.
 */
 function displayMealData(meal) {
-    // Fill in
+    //Image
+    document.getElementById("img").src = meal.strMealThumb;
+
+    //Meal Name
+    document.getElementById("MealName").textContent = meal.strMeal;
+
+    //category
+    document.getElementById("category").textContent = "Category: " + meal.strCategory;
+
+    //ingredients
+    let ingredientList = document.getElementById("ingredients");
+
+    for ( let i = 1; i <= 20; i++){
+      let ingredient = meal["strIngredient" + i];
+      let measure = meal["strMeasure" + i];
+
+      if (!ingredient || ingredient.trim() === "") { 
+        break; 
+      }
+      else {
+        const li = document.createElement("li");
+    
+        li.textContent = measure + " " + ingredient;
+        ingredientList.appendChild(li);
+      }}
+
+      //instructions
+      document.getElementById("instructions").textContent = meal.strInstructions
 }
 
 /*
