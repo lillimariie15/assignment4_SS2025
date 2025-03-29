@@ -58,7 +58,8 @@ function fetchRandomMeal() {
       //veien for å hente informasjon
       let meal = data.meals[0];
       //linker meal dataen til funksjonen som viser det i HTML dokumentet
-      displayMealData(meal)
+      displayMealData(meal);
+      return meal;
       })
     }
 
@@ -126,6 +127,15 @@ Returns a Promise that resolves to cocktail object
 */
 function fetchRandomCocktail() {
     // Fill in
+    fetch("https://www.thecocktaildb.com/api/json/v1/1/random.php")
+    .then(response => response.json())
+    .then(drink => {
+      console.log(drink);
+
+      let cocktail = drink.drinks[0];
+      displayCocktailData(cocktail);
+      return cocktail;
+    })
 }
 
 /*
@@ -133,6 +143,11 @@ Display Cocktail Data in the DOM
 */
 function displayCocktailData(cocktail) {
     // Fill in
+    //image 
+    document.getElementById("drinkimg").src = cocktail.strDrinkThumb
+
+    //drink name
+    document.getElementById("cname").textContent = cocktail.strDrink
 }
 
 /*
