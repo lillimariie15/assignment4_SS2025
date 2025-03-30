@@ -31,17 +31,18 @@ const mealCategoryToCocktailIngredient = {
 */
 function init() {
   fetchRandomMeal()
-    .then((meal) => {
-      displayMealData(meal);
-      const spirit = mapMealCategoryToDrinkIngredient(meal.strCategory);
-      return fetchCocktailByDrinkIngredient(spirit);
-    })
-    .then((cocktail) => {
-      displayCocktailData(cocktail);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+        .then(function(meal) {
+            displayMealData(meal);
+            const spirit = mapMealCategoryToDrinkIngredient(meal.strCategory);
+            console.log("Matchende drikkeingrediens:", spirit);
+            return fetchCocktailByDrinkIngredient(spirit);
+        })
+        .then(function(cocktail) {
+            displayCocktailData(cocktail);
+        })
+        .catch(function(error) {
+            console.error("Error i init-funksjonen:", error);
+        });
 }
 
 /*
@@ -49,18 +50,18 @@ function init() {
  Returns a Promise that resolves with the meal object
  */
 function fetchRandomMeal() {
-    // Fill in
-    fetch("https://www.themealdb.com/api/json/v1/1/random.php")
-    .then(response => response.json())
-    .then(data => {
-      console.log(data);
-
-      //veien for å hente informasjon
-      let meal = data.meals[0];
-      //linker meal dataen til funksjonen som viser det i HTML dokumentet
-      displayMealData(meal);
-      return meal;
-      })
+  return fetch("https://www.themealdb.com/api/json/v1/1/random.php")
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            console.log("Måltids-API fungerer:", data);
+            let meal = data.meals[0];
+            return meal; // Returnerer måltidsobjektet
+        })
+        .catch(function(error) {
+            console.error("Feil ved henting av måltid:", error);
+        });
     }
 
 
@@ -118,7 +119,26 @@ Don't forget encodeURIComponent()
 If no cocktails found, fetch random
 */
 function fetchCocktailByDrinkIngredient(drinkIngredient) {
-    // Fill in
+  console.log("Henter cocktail for:", drinkIngredient);
+    const url = `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(drinkIngredient)}`;
+
+    return fetch(url)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            if (data.drinks && data.drinks.length > 0) {
+                console.log("Fant cocktail:", data.drinks[0]);
+                return data.drinks[0]; // Returnerer cocktailobjektet
+            } else {
+                console.log("Ingen match, henter tilfeldig cocktail");
+                return fetchRandomCocktail(); // Henter tilfeldig cocktail hvis ingen match
+            }
+        })
+        .catch(function(error) {
+            console.error("Feil ved henting av cocktail:", error);
+            return fetchRandomCocktail();
+        });
 }
 
 /*
@@ -126,29 +146,56 @@ Fetch a Random Cocktail (backup in case nothing is found by the search)
 Returns a Promise that resolves to cocktail object
 */
 function fetchRandomCocktail() {
-    // Fill in
-    fetch("https://www.thecocktaildb.com/api/json/v1/1/random.php")
-    .then(response => response.json())
-    .then(drink => {
-      console.log(drink);
-
-      let cocktail = drink.drinks[0];
-      displayCocktailData(cocktail);
-      return cocktail;
-    })
+  console.log("Henter tilfeldig cocktail");
+    return fetch("https://www.thecocktaildb.com/api/json/v1/1/random.php")
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            console.log("Tilfeldig cocktaildata:", data);
+            return data.drinks[0]; // Returnerer cocktailobjektet
+        })
+        .catch(function(error) {
+            console.error("Feil ved henting av tilfeldig cocktail:", error);
+        });
 }
 
 /*
 Display Cocktail Data in the DOM
 */
 function displayCocktailData(cocktail) {
-    // Fill in
-    //image 
-    document.getElementById("drinkimg").src = cocktail.strDrinkThumb
-
-    //drink name
-    document.getElementById("cname").textContent = cocktail.strDrink
+  if (!cocktail) {
+    console.error("Ingen cocktaildata tilgjengelig");
+    return;
 }
+
+// Bilde
+document.getElementById("drinkimg").src = cocktail.strDrinkThumb;
+
+// Navn
+document.getElementById("cname").textContent = cocktail.strDrink;
+
+// Kategori
+document.getElementById("cCategory").textContent = "Category: " + (cocktail.strCategory || "Unknown");
+
+// Ingredienser
+let ingredientList = document.getElementById("cIngredients");
+ingredientList.innerHTML = ""; // Tømmer tidligere innhold
+
+for (let i = 1; i <= 15; i++) {
+    let ingredient = cocktail["strIngredient" + i];
+    let measure = cocktail["strMeasure" + i];
+
+    if (!ingredient || ingredient.trim() === "") {
+        break;
+    }
+
+    const li = document.createElement("li");
+    li.textContent = (measure ? measure + " " : "") + ingredient;
+    ingredientList.appendChild(li);
+}
+}
+
 
 /*
 Call init() when the page loads
